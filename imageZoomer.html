@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 450px;
+      height: 450px;
+      border: 1px solid #000;
+      position: relative;
+      top: 50px;
+      left: 200px;
+    }
+
+    .container .image-zoom-mask {
+      width: 236.25px;
+      height: 236.25px;
+      position: absolute;
+      background: rgba(12, 54, 84, .4);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container image-zoom">
+    <img src="./assets/ca2762256ec6f931.jpg" jqimage="./assets/2fa2ae8df240c819.jpg" alt="">
+  </div>
+  <script>
+    function ImageZoom(option) {
+      const { selector } = option;
+      const container = document.querySelector(selector);
+      const containerW = container.offsetWidth,
+        containerH = container.offsetHeight,
+        containerX = getElementPos(container).x,
+        containerY = getElementPos(container).y;
+      let mask;
+
+      container.addEventListener('mouseenter', (e) => {
+        const { x, y } = getMousePos(e);
+        createMask(x, y);
+      });
+
+      container.addEventListener('mouseleave', (e) => {
+        container.removeChild(mask);
+        mask = null;
+      });
+
+      container.addEventListener('mousemove', (e) => {
+        const { x, y } = getMousePos(e);
+
+      });
+
+      const createMask = (mouseX, mouseY) => {
+        mask = document.createElement('div');
+        mask.className = 'image-zoom-mask';
+        container.appendChild(mask);
+        const { left, right, top, bottom } = calculateMaskPos(mouseX, mouseY, mask.offsetWidth, mask.offsetHeight);
+        left != null && (mask.style.left = left + 'px');
+        right != null && (mask.style.right = right + 'px');
+        top != null && (mask.style.top = top + 'px');
+        bottom != null && (mask.style.bottom = bottom + 'px');
+      }
+
+      const calculateMaskPos = (mouseX, mouseY, width, height) => {
+        let maskPos = {};
+        let x = mouseX - width / 2, y = mouseY - height / 2;
+        if (x < 0) {
+          maskPos.left = 0;
+        } else if ((x + width) > containerW) {
+          maskPos.right = 0;
+        } else {
+          maskPos.left = x;
+        }
+        if (y < 0) {
+          maskPos.top = 0;
+        } else if ((y + height) > containerH) {
+          maskPos.bottom = 0;
+        } else {
+          maskPos.top = y;
+        }
+        return maskPos;
+      }
+
+      function getMousePos(event) {
+        var e = event || window.event;
+        var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+        var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+        var x = e.pageX || e.clientX + scrollX;
+        var y = e.pageY || e.clientY + scrollY;
+        return { 'x': x, 'y': y };
+      }
+
+      function getElementPos(el) {
+        let x = el.offsetLeft, y = el.offsetTop;
+        if (el.offsetParent) {
+          x += getElementPos(el.offsetParent).x;
+          y += getElementPos(el.offsetParent).y;
+        }
+        return { x, y };
+      }
+    }
+
+    ImageZoom({
+      selector: '.image-zoom'
+    });
+  </script>
+</body>
+
+</html>
